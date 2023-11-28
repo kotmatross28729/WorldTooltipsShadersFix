@@ -1,12 +1,17 @@
 package ninja.genuine.tooltips.client.render;
 
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import ninja.genuine.tooltips.system.Tooltip;
 
+import static ninja.genuine.tooltips.WorldTooltips.MODID;
+
 public class RenderHelper {
+
+    private static final ResourceLocation shader = new ResourceLocation(MODID, "shaderfix.png");
 
 	public static void renderTooltipText(Tooltip tooltip, int drawx, int drawy, int alpha) {
 		for (int i = 0; i < tooltip.size(); i++) {
@@ -34,7 +39,7 @@ public class RenderHelper {
 
 	public static void start() {
 		GL11.glPushMatrix();
-		GL11.glDisable(GL11.GL_LIGHTING);
+		//GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -44,7 +49,7 @@ public class RenderHelper {
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_LIGHTING);
+		//GL11.glEnable(GL11.GL_LIGHTING);
 		GL11.glPopMatrix();
 	}
 
@@ -66,12 +71,14 @@ public class RenderHelper {
 		GL11.glShadeModel(GL11.GL_SMOOTH);
 		final Tessellator tessellator = Tessellator.instance;
 		tessellator.startDrawingQuads();
+        //tessellator.setBrightness(15728880);
+        Minecraft.getMinecraft().renderEngine.bindTexture(shader);
 		tessellator.setColorRGBA_F(red1, green1, blue1, alpha1);
-		tessellator.addVertexWithUV(w, y, 0,0,0);
-		tessellator.addVertexWithUV(x, y, 0,0,0);
+		tessellator.addVertexWithUV(w, y, 0,0,1);
+		tessellator.addVertexWithUV(x, y, 0,0,1);
 		tessellator.setColorRGBA_F(red2, green2, blue2, alpha2);
-		tessellator.addVertexWithUV(x, h, 0,0,0);
-		tessellator.addVertexWithUV(w, h, 0,0,0);
+		tessellator.addVertexWithUV(x, h, 0,0,1);
+		tessellator.addVertexWithUV(w, h, 0,0,1);
 		tessellator.draw();
 		GL11.glShadeModel(GL11.GL_FLAT);
 		GL11.glDisable(GL11.GL_BLEND);
