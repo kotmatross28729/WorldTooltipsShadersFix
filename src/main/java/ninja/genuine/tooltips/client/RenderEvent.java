@@ -105,7 +105,7 @@ public static EntityItem getEntityItem(double distance, EntityPlayer player, flo
     Vec3 vec3 = player.getPosition(partialTicks);
     EntityItem item = getEntityItem(player, vec31, vec3);
 
-    if (item != null && player.getDistanceToEntity(item) < WorldTooltips.maxDistance) return item;
+    if (item != null && player.getDistanceToEntity(item) < distance) return item;
 
     return null;
 
