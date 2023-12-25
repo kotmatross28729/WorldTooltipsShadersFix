@@ -18,10 +18,13 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import ninja.genuine.tooltips.WorldTooltips;
 import ninja.genuine.tooltips.system.Tooltip;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RenderEvent {
 //TODO fix World Tooltips.max Distance is not used, which is why it is impossible to change the render distance for tooltips, the current value seems normal, but still
 	private static Minecraft mc;
+    //public static final Logger logger = LogManager.getLogger();
 	private Tooltip cache;
     double distance;
 	public RenderEvent() {}
@@ -36,20 +39,23 @@ public class RenderEvent {
 
 	@SubscribeEvent
 	public void render(final RenderWorldLastEvent event) {
-        if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK){
+        if (mc != null && mc.theWorld != null && mc.thePlayer != null && mc.objectMouseOver != null) {
+
+        if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             distance = mc.thePlayer.getDistance(mc.objectMouseOver.blockX, mc.objectMouseOver.blockY, mc.objectMouseOver.blockZ);
-        }
-        else if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY){
+        } else if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
             distance = mc.thePlayer.getDistanceToEntity(mc.objectMouseOver.entityHit);
         }
         EntityItem entity = getEntityItem(distance, mc.thePlayer, event.partialTicks);
-		 if (!Objects.isNull(entity)) {
-            if (mc.objectMouseOver != null)
-			if (Objects.isNull(cache) || cache.getEntity() != entity)
-				cache = new Tooltip(Minecraft.getMinecraft().thePlayer, entity);
-			cache.renderTooltip3D(mc, event.partialTicks);
-		}
-	}
+        if (!Objects.isNull(entity)) {
+            if (mc.objectMouseOver != null) {
+                if (Objects.isNull(cache) || cache.getEntity() != entity)
+                    cache = new Tooltip(Minecraft.getMinecraft().thePlayer, entity);
+                cache.renderTooltip3D(mc, event.partialTicks);
+            }
+        }
+    }
+}
 
 	@SubscribeEvent
 	public void render(final RenderGameOverlayEvent.Post event) {
