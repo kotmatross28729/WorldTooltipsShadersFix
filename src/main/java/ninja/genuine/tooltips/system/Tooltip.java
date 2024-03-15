@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import org.apache.commons.lang3.text.WordUtils;
 import org.lwjgl.opengl.GL11;
 
@@ -160,6 +161,13 @@ public class Tooltip {
 		final double interpZ = RenderManager.renderPosZ - (entity.posZ - (entity.prevPosZ - entity.posZ) * partialTicks);
 		final double interpDistance = Math.sqrt(interpX * interpX + interpY * interpY + interpZ * interpZ);
 		RenderHelper.start();
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glPushMatrix();
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glLoadMatrix(ActiveRenderInfo.projection);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        GL11.glLoadMatrix(ActiveRenderInfo.modelview);
+
 		GL11.glTranslated(-interpX, -(interpY - 0.55), -interpZ);
 		GL11.glRotatef(-RenderManager.instance.playerViewY + 180, 0, 1, 0);
 		GL11.glRotatef(-RenderManager.instance.playerViewX, 1, 0, 0);
@@ -176,6 +184,10 @@ public class Tooltip {
 		GL11.glRotatef(RenderManager.instance.playerViewX, 1, 0, 0);
 		GL11.glRotatef(RenderManager.instance.playerViewY - 180, 0, 1, 0);
 		GL11.glTranslated(interpX, interpY - entity.height - 0.5, interpZ);
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glPopMatrix();
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+
 		RenderHelper.end();
 	}
 }

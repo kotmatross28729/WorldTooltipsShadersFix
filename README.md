@@ -8,7 +8,7 @@
 
 
 # TODO:
-### Make tooltips glow with shaders
+### ~~Make tooltips glow with shaders~~ done in 1.2.3-84
 
 # License
 

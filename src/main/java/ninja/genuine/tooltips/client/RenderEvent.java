@@ -38,7 +38,10 @@ public class RenderEvent {
 	}
 
 	@SubscribeEvent
-	public void render(final RenderWorldLastEvent event) {
+	public void onRenderWorldLast(final RenderGameOverlayEvent event) {
+        if (event.type != RenderGameOverlayEvent.ElementType.ALL) {
+            return;
+        }
         if (mc != null && mc.theWorld != null && mc.thePlayer != null && mc.objectMouseOver != null) {
 
         if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
