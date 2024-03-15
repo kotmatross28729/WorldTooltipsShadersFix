@@ -10,6 +10,7 @@ import cpw.mods.fml.common.event.FMLModDisabledEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property.Type;
@@ -24,7 +25,6 @@ public class WorldTooltips {
 	public static Configuration config;
 	public static final String MODID = "world-tooltips";
 	public static final String NAME = "World-Tooltips";
-	public static final String URL = "http://genuine.ninja/world-tooltips/";
 	public static final String VERSION = "1.2.3";
 	public static final String DESC = "Choose a color in hexidecimal (ie: 0xAB12cd or #AB12cd) \nYou can look up your favorite colors online.";
 	public static final String GUIID = "worldtooltipsgui";
@@ -32,6 +32,10 @@ public class WorldTooltips {
 	public static float alpha, maxDistance; // maxDistance - 2F = 1 block
 	public static boolean hideModName, overrideOutline;
 	private static boolean enabled = false;
+
+    public static boolean enableMaxDistanceMethod = false;
+
+    public boolean client = FMLLaunchHandler.side().isClient();
 	public RenderEvent events;
 
 	public WorldTooltips() {
@@ -47,27 +51,35 @@ public class WorldTooltips {
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
-		events = new RenderEvent();
-		Tooltip.init();
-		if (enabled)
-			enable();
-		FMLCommonHandler.instance().bus().register(this);
+        if(client) {
+            events = new RenderEvent();
+            Tooltip.init();
+            if (enabled)
+                enable();
+            FMLCommonHandler.instance().bus().register(this);
+        }
 	}
 
 	@EventHandler
 	public void post(FMLPostInitializationEvent event) {
-		events.post();
+        if(client) {
+            events.post();
+        }
 	}
 
 	public void enable() {
-		MinecraftForge.EVENT_BUS.register(events);
-		enabled = true;
+        if(client) {
+            MinecraftForge.EVENT_BUS.register(events);
+            enabled = true;
+        }
 	}
 
 	@EventHandler
 	public void disable(FMLModDisabledEvent event) {
-		MinecraftForge.EVENT_BUS.unregister(events);
-		enabled = false;
+        if(client) {
+            MinecraftForge.EVENT_BUS.unregister(events);
+            enabled = false;
+        }
 	}
 
 	@SubscribeEvent
@@ -90,8 +102,9 @@ public class WorldTooltips {
 
 	private void syncConfig() {
 		hideModName = config.getBoolean("Hide Mod Name", "Appearance", false, "Hide mod names on tooltips.");
-		maxDistance = config.getFloat("Maximum Draw Distance", "Appearance", 10.0F, 2.0F, 64.0F, "Set the maximum distance that tooltips should be displayed from.");
-		overrideOutline = config.getBoolean("Override Outline", "Appearance", false, "If enabled outline color will be manually set instead of default behavior.");
+		maxDistance = config.getFloat("Maximum Draw Distance", "Appearance", 10.0F, 2.0F, 64.0F, "Set the maximum distance that tooltips should be displayed from. Requires \"Enable maxDistance Method\" ");
+        enableMaxDistanceMethod  = config.getBoolean("Enable maxDistance (Maximum Draw Distance) Method", "Appearance", false, "If enabled, the render method will switch to the old getMouseOver() system, this will allow the Maximum Draw Distance config option to be used, but this means tooltips will be rendered through walls.");
+        overrideOutline = config.getBoolean("Override Outline", "Appearance", false, "If enabled, outline color will be manually set instead of default behavior.");
 		alpha = config.getFloat("Transparency", "Appearance", 0.8F, 0.0F, 1.0F, "Set the opacity for the tooltips; 0 being completely invisible and 1 being completely opaque.");
 		try {
 			colorBackground = Integer.decode(config.get("Appearance", "Background Color", "0x100010", DESC, Type.COLOR).getString());
