@@ -25,7 +25,7 @@ public class WorldTooltips {
 	public static Configuration config;
 	public static final String MODID = "world-tooltips";
 	public static final String NAME = "World-Tooltips";
-	public static final String VERSION = "1.2.3";
+	public static final String VERSION = "1.2.3-84" + " kotmatross edition";
 	public static final String DESC = "Choose a color in hexidecimal (ie: 0xAB12cd or #AB12cd) \nYou can look up your favorite colors online.";
 	public static final String GUIID = "worldtooltipsgui";
 	public static int colorBackground, overrideOutlineColor;
