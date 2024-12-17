@@ -8,7 +8,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import com.xiao_xing.BetterTooltipBox.Util.TooltipHelper;
 import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.text.WordUtils;
 import org.lwjgl.opengl.GL11;
 
@@ -116,7 +119,7 @@ public class Tooltip {
 		if (useNei)
 			try {
 				text = (List<String>) info.invoke(null, entity.getEntityItem(), null, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
-			} catch (final Exception e) {}
+			} catch (final Exception ignored) {}
 		if (Objects.isNull(text) || text.isEmpty())
 			text = (List<String>) item.getTooltip(player, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
 		if (!modsAreLoaded() && !WorldTooltips.hideModName)
@@ -178,8 +181,17 @@ public class Tooltip {
 		GL11.glScaled(scale, -scale, scale);
 		int x = -getWidth() / 2;
 		int y = -getHeight();
-		RenderHelper.renderTooltipTile(x, y, getWidth(), getHeight(), colorBackground | alpha, outline1 | alpha, outline2 | alpha);
+
+        if(WorldTooltips.isBetterTooltipsLoaded) {
+            TooltipHelper.z = 0; //Whatever
+            TooltipHelper.DrawTooltip(x, y, getWidth(), getHeight());
+        }
+        else {
+            RenderHelper.renderTooltipTile(x, y, getWidth(), getHeight(), colorBackground | alpha, outline1 | alpha, outline2 | alpha);
+        }
 		RenderHelper.renderTooltipText(this, x, y, alpha);
+
+
 		GL11.glScaled(1F / scale, 1F / -scale, 1F / scale);
 		GL11.glRotatef(RenderManager.instance.playerViewX, 1, 0, 0);
 		GL11.glRotatef(RenderManager.instance.playerViewY - 180, 0, 1, 0);
