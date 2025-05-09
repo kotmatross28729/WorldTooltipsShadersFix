@@ -26,16 +26,16 @@ public class WorldTooltips {
 	public static Configuration config;
 	public static final String MODID = "world-tooltips";
 	public static final String NAME = "World-Tooltips";
-	public static final String VERSION = "1.2.3-85" + " kotmatross edition";
+	public static final String VERSION = "1.2.3-86" + " kotmatross edition";
 	public static final String DESC = "Choose a color in hexidecimal (ie: 0xAB12cd or #AB12cd) \nYou can look up your favorite colors online.";
 	public static final String GUIID = "worldtooltipsgui";
 	public static int colorBackground, overrideOutlineColor;
 	public static float alpha, maxDistance; // maxDistance - 2F = 1 block
 	public static boolean hideModName, overrideOutline;
 	private static boolean enabled = false;
-
+	public static int ticksDelay;
+	public static boolean ticksDelayReset = true;
     public static boolean enableMaxDistanceMethod = false;
-
     public static boolean isBetterTooltipsLoaded;
 
     public boolean client = FMLLaunchHandler.side().isClient();
@@ -108,7 +108,9 @@ public class WorldTooltips {
 	private void syncConfig() {
 		hideModName = config.getBoolean("Hide Mod Name", "Appearance", false, "Hide mod names on tooltips.");
 		maxDistance = config.getFloat("Maximum Draw Distance", "Appearance", 10.0F, 2.0F, 64.0F, "Set the maximum distance that tooltips should be displayed from. Requires \"Enable maxDistance Method\" ");
-        enableMaxDistanceMethod  = config.getBoolean("Enable maxDistance (Maximum Draw Distance) Method", "Appearance", false, "If enabled, the render method will switch to the old getMouseOver() system, this will allow the Maximum Draw Distance config option to be used, but this means tooltips will be rendered through walls.");
+		ticksDelay  = config.getInt("Ticks Delay Before Render", "Appearance", 10, 0, 2147483647, "Delay (in ticks) before rendering the tooltip.");
+		ticksDelayReset = config.getBoolean("Ticks Delay Reset", "Appearance", true, "Whether to reset the tick counter if the player isn't looking at the item. If true, then wait for the delay every time.");
+		enableMaxDistanceMethod  = config.getBoolean("Enable maxDistance (Maximum Draw Distance) Method", "Appearance", false, "If enabled, the render method will switch to the old getMouseOver() system, this will allow the Maximum Draw Distance config option to be used, but this means tooltips will be rendered through walls.");
         overrideOutline = config.getBoolean("Override Outline", "Appearance", false, "If enabled, outline color will be manually set instead of default behavior.");
 		alpha = config.getFloat("Transparency", "Appearance", 0.8F, 0.0F, 1.0F, "Set the opacity for the tooltips; 0 being completely invisible and 1 being completely opaque.");
 		try {

@@ -2,13 +2,10 @@
 
 **World-Tooltips is a mod for Minecraft that adds tooltips over items on the ground making it easier to see what's on the ground.**
 
-# *Differences from the [original version](https://github.com/GenuineSounds/World-Tooltips/tree/1.7.10):*
-### 1) Updated build script, thanks to GTNH!
-### 2) Fixed rendering with shaders, no more flickering
+## *Differences from the [original version](https://github.com/GenuineSounds/World-Tooltips/tree/1.7.10):*
+#### 1) Updated build script, thanks to GTNH!
+#### 2) Fixed rendering with shaders, no more flickering
 
-
-# TODO:
-### ~~Make tooltips glow with shaders~~ done in 1.2.3-84
 
 # License
 

@@ -3,6 +3,8 @@ package ninja.genuine.tooltips.client;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -29,37 +31,55 @@ public class RenderEvent {
 	}
 
 	public void syncColors() {
-		if (!Objects.isNull(cache))
+		if (cache != null)
 			cache.syncSettings();
 	}
-
+	
+	public int ticksOver;
+	private long lastTickCount = 0;
+	
 	@SubscribeEvent
-	public void onRenderWorldLast(final RenderGameOverlayEvent event) {
+	public void onRenderGameOverlayEvent(RenderGameOverlayEvent.Post event) {
         if (event.type != RenderGameOverlayEvent.ElementType.ALL) {
             return;
         }
-        if (mc != null && mc.theWorld != null && mc.thePlayer != null && mc.objectMouseOver != null) {
-
-        if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-            distance = mc.thePlayer.getDistance(mc.objectMouseOver.blockX, mc.objectMouseOver.blockY, mc.objectMouseOver.blockZ);
-        } else if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
-            distance = mc.thePlayer.getDistanceToEntity(mc.objectMouseOver.entityHit);
+		if(mc == null || mc.theWorld == null || mc.thePlayer == null || mc.objectMouseOver == null) {
+			return;
+		}
+		
+		MovingObjectPosition objectMouseOver = mc.objectMouseOver;
+		EntityClientPlayerMP thePlayer = mc.thePlayer;
+		WorldClient theWorld = mc.theWorld;
+		
+        if (objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+            distance = thePlayer.getDistance(objectMouseOver.blockX, objectMouseOver.blockY, objectMouseOver.blockZ);
+        } else if (objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+            distance = thePlayer.getDistanceToEntity(objectMouseOver.entityHit);
         }
-            EntityItem entity;
-            if(!WorldTooltips.enableMaxDistanceMethod){
-            entity = getEntityItem(distance, mc.thePlayer, event.partialTicks);
-        } else {
-            entity = getMouseOver(mc, event.partialTicks);
-        }
-        if (!Objects.isNull(entity)) {
-            if (mc.objectMouseOver != null) {
-                if (Objects.isNull(cache) || cache.getEntity() != entity)
-                    cache = new Tooltip(Minecraft.getMinecraft().thePlayer, entity);
-                cache.renderTooltip3D(mc, event.partialTicks);
-            }
-        }
-    }
-}
+		
+		
+		EntityItem entity = WorldTooltips.enableMaxDistanceMethod
+				? getMouseOver(mc, event.partialTicks)
+				: getEntityItem(distance, thePlayer, event.partialTicks);
+		
+		long currentTickCount = theWorld.getTotalWorldTime();
+		
+		if (currentTickCount != lastTickCount) {
+			lastTickCount = currentTickCount;
+			if (entity != null) {
+				ticksOver++;
+			} else {
+				ticksOver = WorldTooltips.ticksDelayReset ? 0 : Math.max(0, --ticksOver);
+			}
+		}
+		
+		if (ticksOver >= WorldTooltips.ticksDelay && entity != null) {
+			if (cache == null || cache.getEntity() != entity)
+				cache = new Tooltip(thePlayer, entity);
+			
+			cache.renderTooltip3D(mc, event.partialTicks);
+		}
+	}
 
     public static EntityItem getEntityItem(EntityPlayer player, Vec3 vec31, Vec3 vec3) {
         mc.mcProfiler.startSection("world-tooltips"); //Now this thing is in the new method, yay
